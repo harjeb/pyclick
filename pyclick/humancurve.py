@@ -3,6 +3,7 @@ import numpy as np
 import random
 from pyclick._utils import isListOfPoints, isNumeric
 from pyclick._beziercurve import BezierCurve
+from math import sqrt
 
 class HumanCurve():
     """
@@ -14,6 +15,20 @@ class HumanCurve():
         self.fromPoint = fromPoint
         self.toPoint = toPoint
         self.points = self.generateCurve(**kwargs)
+		
+    def calculate_target_points(self):
+        """
+        Calculate the target points based on the distance
+        between fromPoint and toPoint, then add 30% for the offset.
+        """
+        distance = sqrt((self.toPoint[0] - self.fromPoint[0]) ** 2 + (self.toPoint[1] - self.fromPoint[1]) ** 2)
+        offset_distance = distance * 0.3  # 30% of distance
+        total_distance = distance + offset_distance
+        
+        # 设定每 10 像素生成一个点
+        targetPoints = max(2, int(total_distance / 5))  # 确保至少 2 个点
+        print(targetPoints)
+        return targetPoints
 
     def generateCurve(self, **kwargs):
         """
@@ -32,7 +47,8 @@ class HumanCurve():
         distortionStdev = kwargs.get("distortionStdev", 1)
         distortionFrequency = kwargs.get("distortionFrequency", 0.5)
         tween = kwargs.get("tweening", pytweening.easeOutQuad)
-        targetPoints = kwargs.get("targetPoints", 100)
+        #targetPoints = kwargs.get("targetPoints", 100)
+        targetPoints = kwargs.get("targetPoints", self.calculate_target_points())
 
         internalKnots = self.generateInternalKnots(leftBoundary,rightBoundary, \
             downBoundary, upBoundary, knotsCount)
