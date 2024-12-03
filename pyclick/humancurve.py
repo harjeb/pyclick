@@ -26,7 +26,7 @@ class HumanCurve():
         total_distance = distance + offset_distance
         
         # 设定每 10 像素生成一个点
-        targetPoints = max(2, int(total_distance / 5))  # 确保至少 2 个点
+        targetPoints = max(100, int(total_distance / 5))  # 确保至少 2 个点
         print(targetPoints)
         return targetPoints
 
