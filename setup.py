@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='pyclick',
-    version='0.0.1',
+    version='1.2.0',
     author='patrikoss',
-    description='Human mouse movement simulation with python',
+    description='Advanced human mouse movement simulation with distance-based timing and micro-jitter',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/patrikoss/pyclick",

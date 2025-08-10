@@ -16,18 +16,26 @@ class HumanCurve():
         self.toPoint = toPoint
         self.points = self.generateCurve(**kwargs)
 		
-    def calculate_target_points(self):
+    def calculate_target_points(self, use_distance_based=True):
         """
         Calculate the target points based on the distance
-        between fromPoint and toPoint, then add 30% for the offset.
+        使用基于距离的动态点密度算法
         """
         distance = sqrt((self.toPoint[0] - self.fromPoint[0]) ** 2 + (self.toPoint[1] - self.fromPoint[1]) ** 2)
-        offset_distance = distance * 0.3  # 30% of distance
-        total_distance = distance + offset_distance
         
-        # 设定每 10 像素生成一个点
-        targetPoints = max(100, int(total_distance / 5))  # 确保至少 2 个点
-        print(targetPoints)
+        if use_distance_based:
+            # 使用基于真实数据的距离-密度关系
+            from pyclick.distance_based_timing import DistanceBasedTiming
+            timing = DistanceBasedTiming()
+            targetPoints = timing.calculate_optimal_point_count(distance)
+        else:
+            # 原有算法（兼容性）
+            offset_distance = distance * 0.3  # 30% of distance
+            total_distance = distance + offset_distance
+            targetPoints = max(50, int(total_distance / 5))  # 确保至少 50 个点
+        
+        # 确保最小点数
+        targetPoints = max(20, targetPoints)
         return targetPoints
 
     def generateCurve(self, **kwargs):
@@ -47,8 +55,8 @@ class HumanCurve():
         distortionStdev = kwargs.get("distortionStdev", 1)
         distortionFrequency = kwargs.get("distortionFrequency", 0.5)
         tween = kwargs.get("tweening", pytweening.easeOutQuad)
-        #targetPoints = kwargs.get("targetPoints", 100)
-        targetPoints = kwargs.get("targetPoints", self.calculate_target_points())
+        use_distance_based = kwargs.get("use_distance_based", True)
+        targetPoints = kwargs.get("targetPoints", self.calculate_target_points(use_distance_based))
 
         internalKnots = self.generateInternalKnots(leftBoundary,rightBoundary, \
             downBoundary, upBoundary, knotsCount)
